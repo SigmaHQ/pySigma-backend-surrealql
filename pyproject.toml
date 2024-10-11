@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pySigma-backend-surrealql"
+version = "0.1.0"
+description = "pySigma SurrealQL backend"
+authors = ["Raffaele Paolo Fontana <raffaele.fontana.02@gmail.com>"]
+license = "LGPL-3.0-only"
+repository = "https://github.com/obviouslynotraffa/pySigma-backend-surrealql"
+packages = [
+    { include = "sigma" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
