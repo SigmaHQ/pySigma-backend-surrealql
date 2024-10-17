@@ -1,5 +1,5 @@
 ![Tests](https://github.com/obviouslynotraffa/pySigma-backend-surrealql/actions/workflows/test.yml/badge.svg)
-![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/obviouslynotraffa/GitHub Gist identifier containing coverage badge JSON expected by shields.io./raw/obviouslynotraffa-pySigma-backend-surrealql.json)
+![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/obviouslynotraffa/bc9e3d4a25bb853d09a254612c34aa9c/raw/obviouslynotraffa-pySigma-backend-surrealql.json)
 ![Status](https://img.shields.io/badge/Status-pre--release-orange)
 
 # pySigma SurrealQL Backend
