@@ -21,7 +21,7 @@ def test_surrealql_and_expression(surrealql_backend : SurrealQLBackend):
                     fieldB: valueB
                 condition: sel
         """)
-    ) == ['<insert expected result here>']
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE fieldA='valueA' AND fieldB='valueB';"]
 
 def test_surrealql_or_expression(surrealql_backend : SurrealQLBackend):
     assert surrealql_backend.convert(
@@ -38,7 +38,7 @@ def test_surrealql_or_expression(surrealql_backend : SurrealQLBackend):
                     fieldB: valueB
                 condition: 1 of sel*
         """)
-    ) == ['<insert expected result here>']
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE fieldA='valueA' OR fieldB='valueB';"]
 
 def test_surrealql_and_or_expression(surrealql_backend : SurrealQLBackend):
     assert surrealql_backend.convert(
@@ -58,7 +58,7 @@ def test_surrealql_and_or_expression(surrealql_backend : SurrealQLBackend):
                         - valueB2
                 condition: sel
         """)
-    ) == ['<insert expected result here>']
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE (fieldA='valueA1' OR fieldA='valueA2') AND (fieldB='valueB1' OR fieldB='valueB2');"]
 
 def test_surrealql_or_and_expression(surrealql_backend : SurrealQLBackend):
     assert surrealql_backend.convert(
@@ -77,7 +77,7 @@ def test_surrealql_or_and_expression(surrealql_backend : SurrealQLBackend):
                     fieldB: valueB2
                 condition: 1 of sel*
         """)
-    ) == ['<insert expected result here>']
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE (fieldA='valueA1' AND fieldB='valueB1') OR (fieldA='valueA2' AND fieldB='valueB2');"]
 
 def test_surrealql_in_expression(surrealql_backend : SurrealQLBackend):
     assert surrealql_backend.convert(
@@ -95,7 +95,7 @@ def test_surrealql_in_expression(surrealql_backend : SurrealQLBackend):
                         - valueC*
                 condition: sel
         """)
-    ) == ['<insert expected result here>']
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE fieldA='valueA' OR fieldA='valueB' OR string::starts_with(fieldA,'valueC');"]
 
 def test_surrealql_regex_query(surrealql_backend : SurrealQLBackend):
     assert surrealql_backend.convert(
@@ -111,7 +111,7 @@ def test_surrealql_regex_query(surrealql_backend : SurrealQLBackend):
                     fieldB: foo
                 condition: sel
         """)
-    ) == ['<insert expected result here>']
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE fieldA=/foo.*bar/ AND fieldB='foo';"]
 
 def test_surrealql_cidr_query(surrealql_backend : SurrealQLBackend):
     assert surrealql_backend.convert(
@@ -126,7 +126,7 @@ def test_surrealql_cidr_query(surrealql_backend : SurrealQLBackend):
                     field|cidr: 192.168.0.0/16
                 condition: sel
         """)
-    ) == ['<insert expected result here>']
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE string::starts_with(field,'192.168.');"]
 
 def test_surrealql_field_name_with_whitespace(surrealql_backend : SurrealQLBackend):
     assert surrealql_backend.convert(
@@ -141,9 +141,75 @@ def test_surrealql_field_name_with_whitespace(surrealql_backend : SurrealQLBacke
                     field name: value
                 condition: sel
         """)
-    ) == ['<insert expected result here>']
-
+    ) == ["SELECT * FROM <TABLE_NAME> WHERE field_name='value';"]
+    
+    
+def test_surrealql_value_contains(surrealql_backend : SurrealQLBackend):
+    assert (
+        surrealql_backend.convert(
+            SigmaCollection.from_yaml(
+                """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                sel:
+                    fieldA|contains: valueA
+                condition: sel
+        """
+            )
+        )
+        == [
+            "SELECT * FROM <TABLE_NAME> WHERE string::contains(fieldA,'valueA');"
+        ]
+    )
+    
+    
+def test_surrealql_value_startswith(surrealql_backend : SurrealQLBackend):
+    assert (
+        surrealql_backend.convert(
+            SigmaCollection.from_yaml(
+                """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                sel:
+                    fieldA|startswith: valueA
+                condition: sel
+        """
+            )
+        )
+        == [
+            "SELECT * FROM <TABLE_NAME> WHERE string::starts_with(fieldA,'valueA');"
+        ]
+    )
+    
+def test_surrealql_value_endswith(surrealql_backend : SurrealQLBackend):
+    assert (
+        surrealql_backend.convert(
+            SigmaCollection.from_yaml(
+                """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                sel:
+                    fieldA|endswith: valueA
+                condition: sel
+        """
+            )
+        )
+        == [
+            "SELECT * FROM <TABLE_NAME> WHERE string::ends_with(fieldA,'valueA');"
+        ]
+    )
+    
 # TODO: implement tests for all backend features that don't belong to the base class defaults, e.g. features that were
 # implemented with custom code, deferred expressions etc.
-
-
