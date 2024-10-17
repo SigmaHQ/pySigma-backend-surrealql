@@ -33,7 +33,7 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.1.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: GitHub Gist identifier containing coverage badge JSON expected by shields.io.
+          gistID: bc9e3d4a25bb853d09a254612c34aa9c
           filename: obviouslynotraffa-pySigma-backend-surrealql.json
           label: Coverage
           message: ${{ env.COVERAGE }}
