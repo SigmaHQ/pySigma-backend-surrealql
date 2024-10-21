@@ -5,17 +5,12 @@
 # pySigma SurrealQL Backend
 
 This is the SurrealQL backend for pySigma. It provides the package `sigma.backends.surrealql` with the `SurrealQLBackend` class.
-Further, it contains the following processing pipelines in `sigma.pipelines.surrealql`:
-
-* pipeline1: purpose
-* pipeline2: purpose
+This backend translates Sigma Rules into SurrealQL syntax to execute queries in SurrealDB. It was developed using the features provided by SurrealDB version 2.0.
 
 It supports the following output formats:
 
-* default: plain SurrealQL queries
-* format_1: purpose
-* format_2: purpose
+* **default**: plain SurrealQL queries
 
-This backend is currently maintained by:
+This project is currently maintained by:
 
-* [Raffaele Paolo Fontana](https://github.com/obviouslynotraffa/)
+* [Raffaele Fontana](https://github.com/obviouslynotraffa/)
