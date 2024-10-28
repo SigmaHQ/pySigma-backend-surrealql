@@ -1,15 +1,20 @@
+from sigma.conversion.deferred import DeferredQueryExpression
 from sigma.conversion.state import ConversionState
+from sigma.exceptions import SigmaFeatureNotSupportedByBackendError
 from sigma.rule import SigmaRule
 from sigma.conversion.base import TextQueryBackend
-from sigma.conditions import ConditionItem, ConditionAND, ConditionOR, ConditionNOT
-from sigma.types import (
-    SigmaCompareExpression,
-    SigmaRegularExpression,
-    SigmaRegularExpressionFlag,
+from sigma.conditions import (
+    ConditionItem,
+    ConditionAND,
+    ConditionOR,
+    ConditionNOT,
+    ConditionValueExpression
 )
-import sigma
+from sigma.types import (
+    SigmaCompareExpression
+)
 import re
-from typing import ClassVar, Dict, Tuple, Pattern, List, Any, Optional
+from typing import ClassVar, Dict, Tuple, Pattern, Any, Optional, Union
 
 # pySigma backend for querying SurrealDB 2.0
 
@@ -86,7 +91,8 @@ class SurrealQLBackend(TextQueryBackend):
     wildcard_match_expression: ClassVar[str] = (
         "string::matches({field},{value})"  # Special expression if wildcards can't be matched with the eq_token operator
     )
-    wildcard_match_str_expression: ClassVar[str] = "{field}=/{value}/"
+
+    # wildcard_match_str_expression: ClassVar[str] = "{field}=/{value}/"
     # wildcard_match_num_expression: ClassVar[str] = "{field} LIKE '%{value}%'"
 
     ## Regular expressions
@@ -162,8 +168,8 @@ class SurrealQLBackend(TextQueryBackend):
     list_separator: ClassVar[str] = ", "  # List element separator
 
     ## Value not bound to a field
-    # unbound_value_str_expression : ClassVar[str] = "MATCH {value}"   # Expression for string value not bound to a field as format string with placeholder {value}
-    # unbound_value_num_expression : ClassVar[str] = 'MATCH {value}'     # Expression for number value not bound to a field as format string with placeholder {value}
+    # unbound_value_str_expression : ClassVar[str] =    # Expression for string value not bound to a field as format string with placeholder {value}
+    # unbound_value_num_expression : ClassVar[str] =    # Expression for number value not bound to a field as format string with placeholder {value}
 
     # Query finalization: appending and concatenating deferred query part
     deferred_start: ClassVar[str] = (
@@ -181,14 +187,25 @@ class SurrealQLBackend(TextQueryBackend):
     def finalize_query_default(
         self, rule: SigmaRule, query: str, index: int, state: ConversionState
     ) -> Any:
-
-        # TODO : fields support will be handled with a backend option (all fields by default)
-        # fields = "*" if len(rule.fields) == 0 else f"*, {', '.join(rule.fields)}"
-
-        # TODO : table name will be handled with a backend option
         sqlite_query = f"SELECT * FROM {self.table} WHERE {query};"
-
         return sqlite_query
 
     def escape_and_quote_field(self, field_name: str) -> str:
         return field_name.replace(" ", "_")
+
+    # TODO: not sure, but could not be handled in SurrealDB
+    def convert_condition_val_str(
+        self, cond: ConditionValueExpression, state: ConversionState
+    ) -> Union[str, DeferredQueryExpression]:
+        """Conversion of value-only strings."""
+        raise SigmaFeatureNotSupportedByBackendError(
+            "Value-only string expressions (i.e Full Text Search or 'keywords' search) are not supported by the backend."
+        )
+
+    def convert_condition_val_num(
+        self, cond: ConditionValueExpression, state: ConversionState
+    ) -> Union[str, DeferredQueryExpression]:
+        """Conversion of value-only numbers."""
+        raise SigmaFeatureNotSupportedByBackendError(
+            "Value-only number expressions (i.e Full Text Search or 'keywords' search) are not supported by the backend."
+        )
