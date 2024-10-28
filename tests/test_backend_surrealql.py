@@ -8,7 +8,6 @@ def surrealql_backend():
     return SurrealQLBackend()
 
 
-# TODO: implement tests for some basic queries and their expected results.
 def test_surrealql_and_expression(surrealql_backend: SurrealQLBackend):
     assert (
         surrealql_backend.convert(
@@ -262,5 +261,49 @@ def test_surrealql_value_endswith(surrealql_backend: SurrealQLBackend):
     )
 
 
-# TODO: implement tests for all backend features that don't belong to the base class defaults, e.g. features that were
-# implemented with custom code, deferred expressions etc.
+def test_surrealql_fts_keywords_str(surrealql_backend: SurrealQLBackend):
+    with pytest.raises(Exception) as e:
+        surrealql_backend.convert(
+            SigmaCollection.from_yaml(
+                """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                keywords:
+                    - value1
+                    - value2
+                condition: keywords
+        """
+            )
+        )
+    assert (
+        str(e.value)
+        == "Value-only string expressions (i.e Full Text Search or 'keywords' search) are not supported by the backend."
+    )
+
+
+def test_surrealql_fts_keywords_num(surrealql_backend: SurrealQLBackend):
+    with pytest.raises(Exception) as e:
+        surrealql_backend.convert(
+            SigmaCollection.from_yaml(
+                """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                keywords:
+                    - 1
+                    - 2
+                condition: keywords
+        """
+            )
+        )
+    assert (
+        str(e.value)
+        == "Value-only number expressions (i.e Full Text Search or 'keywords' search) are not supported by the backend."
+    )
