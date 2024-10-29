@@ -16,8 +16,6 @@ from sigma.types import (
 import re
 from typing import ClassVar, Dict, Tuple, Pattern, Any, Optional, Union
 
-# pySigma backend for querying SurrealDB 2.0
-
 
 class SurrealQLBackend(TextQueryBackend):
     """SurrealQL backend."""
@@ -26,22 +24,24 @@ class SurrealQLBackend(TextQueryBackend):
     # See the pySigma documentation for further infromation:
     # https://sigmahq-pysigma.readthedocs.io/en/latest/Backends.html
 
-    # Operator precedence: tuple of Condition{AND,OR,NOT} in order of precedence.
-    # The backend generates grouping if required
+    # pySigma backend for querying SurrealDB 2.0
     name: ClassVar[str] = "SurrealQL backend"
     formats: Dict[str, str] = {
         "default": "Plain SurrealQL queries",
     }
+    
+    # Operator precedence: tuple of Condition{AND,OR,NOT} in order of precedence.
     precedence: ClassVar[Tuple[ConditionItem, ConditionItem, ConditionItem]] = (
         ConditionNOT,
         ConditionAND,
         ConditionOR,
     )
 
+    # Reflect parse tree by putting parenthesis around all expressions - use this for target systems without strict precedence rules.
     parenthesize: bool = True
-    group_expression: ClassVar[str] = (
-        "({expr})"  # Expression for precedence override grouping as format string with {expr} placeholder
-    )
+    
+    # Expression for precedence override grouping as format string with {expr} placeholder
+    group_expression: ClassVar[str] = "({expr})"
 
     # Generated query tokens
     token_separator: str = " "  # Separator inserted between all boolean operators
@@ -50,9 +50,7 @@ class SurrealQLBackend(TextQueryBackend):
     not_token: ClassVar[str] = "NOT"  # Token used for NOT operations
     eq_token: ClassVar[str] = "="  # Token used for equality comparison
 
-    # String output
-    ## Fields
-    ### Quoting
+
     field_quote: ClassVar[str] = "'"  # Field quoting character
     field_quote_pattern: ClassVar[Pattern] = re.compile(
         "^[a-zA-Z0-9_]*$"
@@ -88,10 +86,9 @@ class SurrealQLBackend(TextQueryBackend):
     startswith_expression: ClassVar[str] = "string::starts_with({field},{value})"
     endswith_expression: ClassVar[str] = "string::ends_with({field},{value})"
     contains_expression: ClassVar[str] = "string::contains({field},{value})"
-    wildcard_match_expression: ClassVar[str] = (
-        "string::matches({field},{value})"  # Special expression if wildcards can't be matched with the eq_token operator
-    )
+    wildcard_match_expression: ClassVar[str] = "string::matches({field},{value})"
 
+    ## Wildcard matching expressions(Not supported by SurrealQL)
     # wildcard_match_str_expression: ClassVar[str] = "{field}=/{value}/"
     # wildcard_match_num_expression: ClassVar[str] = "{field} LIKE '%{value}%'"
 
@@ -167,7 +164,7 @@ class SurrealQLBackend(TextQueryBackend):
     )
     list_separator: ClassVar[str] = ", "  # List element separator
 
-    ## Value not bound to a field
+    ## Value not bound to a field (not supported by SurrealQL)
     # unbound_value_str_expression : ClassVar[str] =    # Expression for string value not bound to a field as format string with placeholder {value}
     # unbound_value_num_expression : ClassVar[str] =    # Expression for number value not bound to a field as format string with placeholder {value}
 
@@ -184,14 +181,19 @@ class SurrealQLBackend(TextQueryBackend):
 
     table = "<TABLE_NAME>"
 
+
     def finalize_query_default(
         self, rule: SigmaRule, query: str, index: int, state: ConversionState
     ) -> Any:
+        """Finalize query by setting up the structure."""
         sqlite_query = f"SELECT * FROM {self.table} WHERE {query};"
         return sqlite_query
 
+    # Surreal does not support field names with spaces
     def escape_and_quote_field(self, field_name: str) -> str:
+        """ Escape and quote field name """
         return field_name.replace(" ", "_")
+
 
     # TODO: not sure, but could not be handled in SurrealDB
     def convert_condition_val_str(
