@@ -81,12 +81,14 @@ class SurrealQLBackend(TextQueryBackend):
             False: "FALSE",
         }
     )
-
+    
     ## String matching operators. if none is appropriate eq_token is used.
-    startswith_expression: ClassVar[str] = "string::starts_with({field},{value})"
-    endswith_expression: ClassVar[str] = "string::ends_with({field},{value})"
-    contains_expression: ClassVar[str] = "string::contains({field},{value})"
-    wildcard_match_expression: ClassVar[str] = "string::matches({field},{value})"
+    ### We need to check if the field is not NONE before using the string functions,
+    ### because SurrealDB throws an Error if the field is NONE.
+    startswith_expression: ClassVar[str] = "({field} IS NOT NONE AND string::starts_with({field},{value}))"
+    endswith_expression: ClassVar[str] = "({field} IS NOT NONE AND string::ends_with({field},{value}))"
+    contains_expression: ClassVar[str] = "({field} IS NOT NONE AND string::contains({field},{value}))"
+    wildcard_match_expression: ClassVar[str] = "({field} IS NOT NONE AND string::matches({field},{value}))"
 
     ## Wildcard matching expressions(Not supported by SurrealQL)
     # wildcard_match_str_expression: ClassVar[str] = "{field}=/{value}/"
