@@ -129,7 +129,7 @@ def test_surrealql_in_expression(surrealql_backend: SurrealQLBackend):
             )
         )
         == [
-            "SELECT * FROM <TABLE_NAME> WHERE fieldA='valueA' OR fieldA='valueB' OR string::starts_with(fieldA,'valueC');"
+            "SELECT * FROM <TABLE_NAME> WHERE fieldA='valueA' OR fieldA='valueB' OR (fieldA IS NOT NONE AND string::starts_with(fieldA,'valueC'));"
         ]
     )
 
@@ -173,7 +173,7 @@ def test_surrealql_cidr_query(surrealql_backend: SurrealQLBackend):
         """
             )
         )
-        == ["SELECT * FROM <TABLE_NAME> WHERE string::starts_with(field,'192.168.');"]
+        == ["SELECT * FROM <TABLE_NAME> WHERE (field IS NOT NONE AND string::starts_with(field,'192.168.'));"]
     )
 
 
@@ -215,7 +215,7 @@ def test_surrealql_value_contains(surrealql_backend: SurrealQLBackend):
         """
             )
         )
-        == ["SELECT * FROM <TABLE_NAME> WHERE string::contains(fieldA,'valueA');"]
+        == ["SELECT * FROM <TABLE_NAME> WHERE (fieldA IS NOT NONE AND string::contains(fieldA,'valueA'));"]
     )
 
 
@@ -236,7 +236,7 @@ def test_surrealql_value_startswith(surrealql_backend: SurrealQLBackend):
         """
             )
         )
-        == ["SELECT * FROM <TABLE_NAME> WHERE string::starts_with(fieldA,'valueA');"]
+        == ["SELECT * FROM <TABLE_NAME> WHERE (fieldA IS NOT NONE AND string::starts_with(fieldA,'valueA'));"]
     )
 
 
@@ -257,7 +257,7 @@ def test_surrealql_value_endswith(surrealql_backend: SurrealQLBackend):
         """
             )
         )
-        == ["SELECT * FROM <TABLE_NAME> WHERE string::ends_with(fieldA,'valueA');"]
+        == ["SELECT * FROM <TABLE_NAME> WHERE (fieldA IS NOT NONE AND string::ends_with(fieldA,'valueA'));"]
     )
 
 
