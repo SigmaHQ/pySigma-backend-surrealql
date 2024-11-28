@@ -13,4 +13,10 @@ It supports the following output formats:
 
 This project is currently maintained by:
 
-* [Raffaele Fontana](https://github.com/obviouslynotraffa/)
+* [obviouslynotraffa](https://github.com/obviouslynotraffa/)
+
+
+### Known issues/limitations
+* This [issue](https://github.com/obviouslynotraffa/pySigma-backend-surrealql/issues/1)
+* In the future, `AND` or `OR` lists could be converted into the `IN` operator, but this is not a priority for now
+* In SurrealDB, it is necessary to create a specific index beforehand for full-text search functionality
