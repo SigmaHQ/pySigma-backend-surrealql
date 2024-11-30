@@ -10,8 +10,8 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ 'ubuntu-20.04' ]
-        python-version: [ '3.8', '3.9', '3.10', '3.11' ]
+        os: [ 'ubuntu-22.04' ]
+        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -29,12 +29,12 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: poetry run python print-coverage.py >> $GITHUB_ENV
       - name: Create coverage badge
-        if: ${{ github.repository == 'obviouslynotraffa/pySigma-backend-surrealql' && github.event_name == 'push' && runner.os == 'Linux' }}
+        if: ${{ github.repository == 'SigmaHQ/pySigma-backend-surrealql' && github.event_name == 'push' && runner.os == 'Linux' }}
         uses: schneegans/dynamic-badges-action@v1.1.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: bc9e3d4a25bb853d09a254612c34aa9c
-          filename: obviouslynotraffa-pySigma-backend-surrealql.json
+          gistID: de5623fbf07513f8c1170083f2d5b71c
+          filename: SigmaHQ-pySigma-backend-surrealql.json
           label: Coverage
           message: ${{ env.COVERAGE }}
           color: ${{ env.COVERAGE_COLOR }}
