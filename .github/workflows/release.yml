@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-20.04
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v2
       - name: Install Poetry
